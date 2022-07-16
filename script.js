@@ -1,7 +1,7 @@
 function process(event) {
 	var x = Math.random()*100;
 	var ch;
-	var string;
+	var string='';
 	var files = event.target.files
 	var reader = new FileReader()
 	reader.onload = function() {
@@ -17,7 +17,20 @@ function process(event) {
 		var blob = new Blob([string], {
 			type: "text/plain;charset=utf-8"
 		});
-		saveAs(blob);
+		if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(blob, "result.txt");
+		else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = "result.txt";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
     }
 	document.write("</body></html>");
 	
